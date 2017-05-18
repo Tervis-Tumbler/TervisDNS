@@ -22,3 +22,34 @@ function Remove-TervisDNSRecordsforVM{
     if($PassThru) {$VM}
 }
 
+function Set-TervisDnsServerResourceRecordOldToNewIPv4 {
+    param (
+        $OldIPAddress,
+        $NewIPAddress
+    )
+    $DnsServerZones = Get-DnsServerZone | 
+    Where { -not $_.IsReverseLookupZone }
+ 
+    $Records = foreach ($Zone in $DnsServerZones) {
+        $Zone |
+        Get-DnsServerResourceRecord -RRType A |
+        Add-Member -MemberType NoteProperty -Name ZoneName -Value $Zone.ZoneName -PassThru |
+        where { $_.RecordData.IPv4Address.IPAddressToString -EQ $OldIPAddress }
+    }
+
+    $Records | Update-TervisDnsServerAResourceRecordIPAddress -IPAddress $NewIPAddress
+}
+
+function Update-TervisDnsServerAResourceRecordIPAddress {
+    param (
+        [Parameter(Mandatory,ValueFromPipeline)]$ResourceRecord,
+        [Parameter(Mandatory)]$IPAddress,
+        [Parameter(Mandatory,ValueFromPipelineByPropertyName)]$ZoneName,
+        [Switch]$PassThru
+    )
+    process {
+        $NewResourceRecord = $ResourceRecord.Clone()
+        $NewResourceRecord.RecordData.IPv4Address = $IPAddress
+        Set-DnsServerResourceRecord -NewInputObject $NewResourceRecord -OldInputObject $ResourceRecord -ZoneName $ZoneName -PassThru:$PassThru
+    }
+}
