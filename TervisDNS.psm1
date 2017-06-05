@@ -4,22 +4,24 @@
     select -First 1 -ExpandProperty NameExchange
 }
 
-function Remove-TervisDNSRecordsforVM{
+function Remove-TervisDNSRecord {
     [CmdletBinding()]
     param(
-        [parameter(Mandatory, ValueFromPipeline)]$VM,
-        [switch]$PassThru
+        [parameter(Mandatory, ValueFromPipeline)]$ComputerName
     )
-    $NodeToDelete = $VM.Name
-    $DNSServer = "inf-dc1"
-    $ZoneName = "tervis.prv"
-    $NodeDNS = $null
-    $NodeDNSARecord = Get-DnsServerResourceRecord -ZoneName $ZoneName -ComputerName $DNSServer -Node $NodeToDelete -RRType A -ErrorAction SilentlyContinue
-    $NodeDNSCnameRecord = Get-DnsServerResourceRecord -ZoneName $ZoneName -ComputerName $DNSServer -RRType CName -ErrorAction SilentlyContinue | where { $_.recorddata.hostnamealias -Match $nodetodelete}
-    if($NodeDNSARecord){Remove-DnsServerResourceRecord -ZoneName $ZoneName -ComputerName $DNSServer -InputObject $NodeDNSARecord -Confirm}
-    if($NodeDNSCnameRecord){Remove-DnsServerResourceRecord -ZoneName $ZoneName -ComputerName $DNSServer -InputObject $NodeDNSCnameRecord -Confirm}
+    begin {
+        $DomainController = Get-ADDomainController        
+        $DNSServerName = $DomainController.HostName
+        $ZoneName = $DomainController.Domain
+    }
+    process {
+        Get-DnsServerResourceRecord -ZoneName $ZoneName -ComputerName $DNSServerName -Node $ComputerName -RRType A -ErrorAction SilentlyContinue |
+        Remove-DnsServerResourceRecord -ZoneName $ZoneName -ComputerName $DNSServerName
 
-    if($PassThru) {$VM}
+        Get-DnsServerResourceRecord -ZoneName $ZoneName -ComputerName $DNSServerName -RRType CName -ErrorAction SilentlyContinue | 
+        where { $_.recorddata.hostnamealias -Match $ComputerName } |
+        Remove-DnsServerResourceRecord -ZoneName $ZoneName -ComputerName $DNSServerName
+    }
 }
 
 function Set-TervisDnsServerResourceRecordOldToNewIPv4 {
