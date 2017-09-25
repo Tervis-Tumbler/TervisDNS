@@ -203,3 +203,20 @@ function Update-ExternalServicesInDNS {
         }
     }
 }
+
+function Install-UpdateExternalServicesInDNS {
+    param (
+        [Parameter(Mandatory,ValueFromPipelineByPropertyName)]$ComputerName
+    )
+    begin {
+        $ScheduledTaskCredential = New-Object System.Management.Automation.PSCredential (Get-PasswordstateCredential -PasswordID 259)
+        $Execute = 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+        $Argument = '-Command Update-ExternalServicesInDNS'
+    }
+    process {
+        $CimSession = New-CimSession -ComputerName $ComputerName
+        If (-NOT (Get-ScheduledTask -TaskName Update-ExternalServicesInDNS -CimSession $CimSession -ErrorAction SilentlyContinue)) {
+            Install-TervisScheduledTask -Credential $ScheduledTaskCredential -TaskName Update-ExternalServicesInDNS -Execute $Execute -Argument $Argument -RepetitionIntervalName EveryDayEver5Minutes -ComputerName $ComputerName
+        }
+    }
+}
