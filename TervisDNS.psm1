@@ -60,6 +60,7 @@ function Update-ExternalServicesInDNS {
     begin {
         $WebRequest = Invoke-WebRequest "http://api.ipify.org/"
         [string]$FinalIPAddress = $WebRequest.content
+        Connect-ToAzure -Subscription Production/Infrastructure
     }
 
     process {
