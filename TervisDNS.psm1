@@ -170,7 +170,7 @@ function Update-ExternalServicesInDNS {
 
     end {
         if ($FinalIPAddress -eq '38.95.4.130' -or $FinalIPAddress -eq '38.95.4.131') {
-            if (!($Changes -eq '')) {
+            if ($Changes) {
                     $body = 'The failover script running on DNS1 detected an ISP change. ' + `
                 'The current ISP is Cogent. Below are the settings that were updated by Update-ExternalServicesInDns.ps1 ' + "`n`n" + `
                 $Changes
@@ -181,7 +181,7 @@ function Update-ExternalServicesInDNS {
                 -smtpServer hermes.tervis.com
             }
         } elseif ($FinalIPAddress -eq '100.3.102.2' -or $FinalIPAddress -eq '100.3.102.3') {
-            if (!($Changes -eq '')) {
+            if ($Changes) {
                     $body = 'The failover script running on DNS1 detected an ISP change. ' + `
                 'The current ISP is Fios150. Below are the settings that were updated by Update-ExternalServicesInDns.ps1 ' + "`n`n" + `
                 $Changes
