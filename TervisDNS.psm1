@@ -171,7 +171,7 @@ function Update-ExternalServicesInDNS {
     end {
         if ($FinalIPAddress -eq '38.95.4.130' -or $FinalIPAddress -eq '38.95.4.131') {
             if ($Changes) {
-                    $body = 'The failover script running on DNS1 detected an ISP change. ' + `
+                    $body = 'The failover script detected an ISP change. ' + `
                 'The current ISP is Cogent. Below are the settings that were updated by Update-ExternalServicesInDns.ps1 ' + "`n`n" + `
                 $Changes
                 send-mailmessage -to "SystemsTeam@tervis.com" `
@@ -182,7 +182,7 @@ function Update-ExternalServicesInDNS {
             }
         } elseif ($FinalIPAddress -eq '100.3.102.2' -or $FinalIPAddress -eq '100.3.102.3') {
             if ($Changes) {
-                    $body = 'The failover script running on DNS1 detected an ISP change. ' + `
+                    $body = 'The failover script detected an ISP change. ' + `
                 'The current ISP is Fios150. Below are the settings that were updated by Update-ExternalServicesInDns.ps1 ' + "`n`n" + `
                 $Changes
                 send-mailmessage -to "SystemsTeam@tervis.com" `
@@ -192,7 +192,7 @@ function Update-ExternalServicesInDNS {
                 -smtpServer hermes.tervis.com
             }
         } else {
-            $body = 'The failover script Update-ExternalServicesInDNS running on DNS1 was not able to determine the public IP address, ' + `
+            $body = 'The failover script Update-ExternalServicesInDNS was not able to determine the public IP address, ' + `
             'or the response was not a defined public IP. This could just be a timeout, but if it happens a lot it may need to be looked at. ' + `
             'Below is the results of the public IP address query. ' + `
             $FinalIPAddress
