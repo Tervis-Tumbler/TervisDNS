@@ -72,11 +72,11 @@ function Update-ExternalServicesInDNS {
         if (($FinalIPAddress -eq '38.95.4.130' -or $FinalIPAddress -eq '38.95.4.131') -and (-NOT ($CurrentAutoDiscoverCname -match "hermes.cogent.tervis.com"))) {
             $CurrentAutoDiscover | Remove-AzureRmDnsRecordSet
             New-AzureRmDnsRecordSet -Name autodiscover -RecordType CNAME -ZoneName tervis.com -ResourceGroupName Infrastructure -Ttl 300 -DnsRecords (New-AzureRmDnsRecordConfig -Cname "hermes.cogent.tervis.com")
-            $Changes += "autodiscover.tervis.com was pointed to hermes.cogent.tervis.com. `r"
+            $Changes += "autodiscover.tervis.com was pointed to autodiscover.cogent.tervis.com. `r"
         } elseif (($FinalIPAddress -eq '100.3.102.2' -or $FinalIPAddress -eq '100.3.102.3') -and (-NOT ($CurrentAutoDiscoverCname -match "hermes.fios150.tervis.com"))) {
             $CurrentAutoDiscover | Remove-AzureRmDnsRecordSet
             New-AzureRmDnsRecordSet -Name autodiscover -RecordType CNAME -ZoneName tervis.com -ResourceGroupName Infrastructure -Ttl 300 -DnsRecords (New-AzureRmDnsRecordConfig -Cname "hermes.fios150.tervis.com")
-            $Changes += "autodiscover.tervis.com was pointed to hermes.fios150.tervis.com. `r"
+            $Changes += "autodiscover.tervis.com was pointed to autodiscover.fios150.tervis.com. `r"
         }
 
         $CurrentCiscoVPN = Get-AzureRmDnsRecordSet -ZoneName tervis.com -Name ciscovpn -ResourceGroupName Infrastructure -RecordType CNAME
@@ -86,15 +86,15 @@ function Update-ExternalServicesInDNS {
         if (($FinalIPAddress -eq '38.95.4.130' -or $FinalIPAddress -eq '38.95.4.131') -and (-NOT ($CurrentCiscoVpnCname -match "ciscovpn.cogent.tervis.com"))) {
             $CurrentCiscoVPN | Remove-AzureRmDnsRecordSet
             New-AzureRmDnsRecordSet -Name ciscovpn -RecordType CNAME -ZoneName tervis.com -ResourceGroupName Infrastructure -Ttl 300 -DnsRecords (New-AzureRmDnsRecordConfig -Cname "ciscovpn.cogent.tervis.com")
-            $Changes += "ciscovpn.tervis.com was pointed to hermes.cogent.tervis.com. `r"
+            $Changes += "ciscovpn.tervis.com was pointed to ciscovpn.cogent.tervis.com. `r"
         } elseif (($FinalIPAddress -eq '100.3.102.2' -or $FinalIPAddress -eq '100.3.102.3') -and (-NOT ($CurrentCiscoVpnCname -match "ciscovpn.fios150.tervis.com"))) {
             $CurrentCiscoVPN | Remove-AzureRmDnsRecordSet
             New-AzureRmDnsRecordSet -Name ciscovpn -RecordType CNAME -ZoneName tervis.com -ResourceGroupName Infrastructure -Ttl 300 -DnsRecords (New-AzureRmDnsRecordConfig -Cname "ciscovpn.fios150.tervis.com")
-            $Changes += "ciscovpn.tervis.com was pointed to hermes.fios150.tervis.com. `r"
+            $Changes += "ciscovpn.tervis.com was pointed to ciscovpn.fios150.tervis.com. `r"
         } elseif (($FinalIPAddress -eq '96.243.198.58' -or $FinalIPAddress -eq '96.243.198.60') -and (-NOT ($CurrentCiscoVpnCname -match "ciscovpn.fios25.tervis.com"))) {
             $CurrentCiscoVPN | Remove-AzureRmDnsRecordSet
             New-AzureRmDnsRecordSet -Name ciscovpn -RecordType CNAME -ZoneName tervis.com -ResourceGroupName Infrastructure -Ttl 300 -DnsRecords (New-AzureRmDnsRecordConfig -Cname "ciscovpn.fios25.tervis.com")
-            $Changes += "ciscovpn.tervis.com was pointed to hermes.fios25.tervis.com. `r"
+            $Changes += "ciscovpn.tervis.com was pointed to ciscovpn.fios25.tervis.com. `r"
         }
 
         $CurrentDemandwareFtp = Get-AzureRmDnsRecordSet -ZoneName tervis.com -Name demandwareftp -ResourceGroupName Infrastructure -RecordType CNAME
@@ -171,8 +171,9 @@ function Update-ExternalServicesInDNS {
     end {
         if ($FinalIPAddress -eq '38.95.4.130' -or $FinalIPAddress -eq '38.95.4.131') {
             if ($Changes) {
-                    $body = 'The failover script detected an ISP change. ' + `
-                'The current ISP is Cogent. Below are the settings that were updated by Update-ExternalServicesInDns.ps1 ' + "`n`n" + `
+                $body = 'The failover script detected an ISP change. ' + `
+                'The current IP address is ' + $FinalIPAddress + '. ' + `
+                'The current ISP is Cogent. Below are the settings that were updated by Update-ExternalServicesInDns ' + "`n`n" + `
                 $Changes
                 send-mailmessage -to "SystemsTeam@tervis.com" `
                 -from "mailerdaemon@tervis.com" `
@@ -182,12 +183,25 @@ function Update-ExternalServicesInDNS {
             }
         } elseif ($FinalIPAddress -eq '100.3.102.2' -or $FinalIPAddress -eq '100.3.102.3') {
             if ($Changes) {
-                    $body = 'The failover script detected an ISP change. ' + `
-                'The current ISP is Fios150. Below are the settings that were updated by Update-ExternalServicesInDns.ps1 ' + "`n`n" + `
+                $body = 'The failover script detected an ISP change. ' + `
+                'The current IP address is ' + $FinalIPAddress + '. ' + `
+                'The current ISP is Fios150. Below are the settings that were updated by Update-ExternalServicesInDns ' + "`n`n" + `
                 $Changes
                 send-mailmessage -to "SystemsTeam@tervis.com" `
                 -from "mailerdaemon@tervis.com" `
                 -subject "Failover Script: External services moved to the Fios150 ISP" `
+                -body $body `
+                -smtpServer hermes.tervis.com
+            }
+        } elseif ($FinalIPAddress -eq '96.243.198.58' -or $FinalIPAddress -eq '96.243.198.60') {
+            if ($Changes) {
+                $body = 'The failover script detected an ISP change. ' + `
+                'The current IP address is ' + $FinalIPAddress + '. ' + `
+                'The current ISP is Fios25. Below are the settings that were updated by Update-ExternalServicesInDns ' + "`n`n" + `
+                $Changes
+                send-mailmessage -to "SystemsTeam@tervis.com" `
+                -from "mailerdaemon@tervis.com" `
+                -subject "Failover Script: External services moved to the Fios25 ISP" `
                 -body $body `
                 -smtpServer hermes.tervis.com
             }
