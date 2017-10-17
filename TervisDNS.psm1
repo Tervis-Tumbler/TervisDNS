@@ -70,7 +70,7 @@ function Update-ExternalServicesInDNS {
                 $FinalIPAddress
         }
         $AzureContext = Get-AzureRmContext
-        If (-NOT (($AzureContext).TenantId -match "30463752-65ac")) {
+        If (-NOT (($AzureContext).Name -match "8b3835b7-ddd8-41fc-9ee1-297bfe67e2a3")) {
             $Errors += "The failover script Update-ExternalServicesInDNS was not able to connect to Azure via PowerShell. `r"
         }
     }
