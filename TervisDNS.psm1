@@ -174,6 +174,24 @@ function Update-ExternalServicesInDNS {
                     $Errors += "Update-ExternalServicesInDNS could not get the current configuration for mizerftp.tervis.com from Azure. `r"
                 }
 
+                $CurrentPncBankFtp = Get-AzureRmDnsRecordSet -ZoneName tervis.com -Name pncbankftp -ResourceGroupName Infrastructure -RecordType CNAME
+                if ($CurrentPncBankFtp) {
+                    $CurrentPncBankFtpCname = $CurrentPncBankFtp | 
+                        Select -ExpandProperty Records | 
+                        Select -ExpandProperty Cname
+                    if (($FinalIPAddress -eq '38.95.4.130' -or $FinalIPAddress -eq '38.95.4.131') -and (-NOT ($CurrentPncBankFtpCname -match "pncbankftp.cogent.tervis.com"))) {
+                        $CurrentPncBankFtp | Remove-AzureRmDnsRecordSet
+                        New-AzureRmDnsRecordSet -Name pncbankftp -RecordType CNAME -ZoneName tervis.com -ResourceGroupName Infrastructure -Ttl 300 -DnsRecords (New-AzureRmDnsRecordConfig -Cname "pncbankftp.cogent.tervis.com")
+                        $Changes += "pncbankftp.tervis.com was pointed to pncbankftp.cogent.tervis.com. `r"
+                    } elseif (($FinalIPAddress -eq '100.3.102.2' -or $FinalIPAddress -eq '100.3.102.3') -and (-NOT ($CurrentPncBankFtpCname -match "pncbankftp.fios150.tervis.com"))) {
+                        $CurrentPncBankFtp | Remove-AzureRmDnsRecordSet
+                        New-AzureRmDnsRecordSet -Name pncbankftp -RecordType CNAME -ZoneName tervis.com -ResourceGroupName Infrastructure -Ttl 300 -DnsRecords (New-AzureRmDnsRecordConfig -Cname "pncbankftp.fios150.tervis.com")
+                        $Changes += "pncbankftp.tervis.com was pointed to pncbankftp.fios150.tervis.com. `r"
+                    }
+                } else {
+                    $Errors += "Update-ExternalServicesInDNS could not get the current configuration for pncbankftp.tervis.com from Azure. `r"
+                }
+
                 $CurrentRdGateway = Get-AzureRmDnsRecordSet -ZoneName tervis.com -Name rdgateway -ResourceGroupName Infrastructure -RecordType CNAME
                 if ($CurrentRdGateway) {
                     $CurrentRdGatewayCname = $CurrentRdGateway | 
