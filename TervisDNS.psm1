@@ -334,3 +334,18 @@ function Install-UpdateExternalServicesInDNS {
         }
     }
 }
+
+function Get-TervisDNSName {
+    param (
+        [Parameter(Mandatory,ValueFromPipeline)]$Host,
+        $EnvironmentName
+    )
+    begin {
+        if ( -not $Script:ADDomain) { 
+            $Script:ADDomain = Get-ADDomain
+        }
+    }
+    process {
+        "$Host$(if($EnvironmentName){".$EnvironmentName"}).$($Script:ADDomain.DNSRoot)"
+    }
+}
