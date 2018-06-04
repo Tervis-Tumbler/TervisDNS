@@ -19,7 +19,7 @@ function Remove-TervisDNSRecord {
         Remove-DnsServerResourceRecord -ZoneName $ZoneName -ComputerName $DNSServerName
 
         Get-DnsServerResourceRecord -ZoneName $ZoneName -ComputerName $DNSServerName -RRType CName -ErrorAction SilentlyContinue | 
-        where { $_.recorddata.hostnamealias -Match $ComputerName } |
+        where { $_.recorddata.hostnamealias -eq "$ComputerName.$($DomainController.Domain)." } |
         Remove-DnsServerResourceRecord -ZoneName $ZoneName -ComputerName $DNSServerName
     }
 }
