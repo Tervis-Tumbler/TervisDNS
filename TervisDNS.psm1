@@ -323,7 +323,7 @@ function Install-UpdateExternalServicesInDNS {
         [Parameter(Mandatory,ValueFromPipelineByPropertyName)]$ComputerName
     )
     begin {
-        $ScheduledTaskCredential = New-Object System.Management.Automation.PSCredential (Get-PasswordstateCredential -PasswordID 259)
+        $ScheduledTaskCredential = Get-PasswordstatePassword -AsCredential -ID 259
         $Execute = 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
         $Argument = '-Command Update-ExternalServicesInDNS'
     }
