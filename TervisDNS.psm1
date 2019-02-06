@@ -244,11 +244,10 @@ function Update-ExternalServicesInDNS {
                             "Below are the errors encountered by Update-ExternalServicesInDNS. `r" + `
                             $Errors
                     }
-                    send-mailmessage -to "SystemsTeam@tervis.com" `
+                    Send-TervisMailMessage -to "SystemsTeam@tervis.com" `
                         -from "mailerdaemon@tervis.com" `
                         -subject "Failover Script: External services moved to the Cogent ISP" `
-                        -body $body `
-                        -smtpServer hermes.tervis.com
+                        -body $body
                 }
             } elseif ($FinalIPAddress -eq '100.3.102.2' -or $FinalIPAddress -eq '100.3.102.3') {
                 if ($Changes) {
