@@ -263,8 +263,7 @@ function Update-ExternalServicesInDNS {
                     send-mailmessage -to "SystemsTeam@tervis.com" `
                         -from "mailerdaemon@tervis.com" `
                         -subject "Failover Script: External services moved to the Fios150 ISP" `
-                        -body $body `
-                        -smtpServer hermes.tervis.com
+                        -body $body
                 }
             } elseif ($FinalIPAddress -eq '96.243.198.58' -or $FinalIPAddress -eq '96.243.198.60') {
                 if ($Changes) {
